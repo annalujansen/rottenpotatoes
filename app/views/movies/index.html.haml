@@ -1,4 +1,6 @@
 %p{style: "color: green"}= notice
+- if flash[:warning]
+  %p#warning{style: "color: red"}= flash[:warning]
 
 - content_for :title, "Movies"
 
@@ -8,7 +10,7 @@
   %thead
     %tr
       %th{class: ("highlight" if @sort == "title")}
-        = link_to "Título", movies_path(sort: "title"), id: :title_header      
+        = link_to "Movie Title", movies_path(sort: "title"), id: :title_header      
       %th Classificação
       %th{class: ("highlight" if @sort == "release_date")}
         = link_to "Lançamento", movies_path(sort: "release_date"), id: :release_date_header      
@@ -22,4 +24,11 @@
         %td{class: ("highlight" if @sort == "release_date")}= movie.release_date        
         %td= link_to "Ver detalhes", movie_path(movie)
 
-= link_to "Novo filme", new_movie_path
+= link_to "Add new movie", new_movie_path
+
+%h2 Search TMDb for a movie
+
+= form_tag search_tmdb_path, id: "search_tmdb_form" do
+  = label_tag :search_terms, "Search Terms"
+  = text_field_tag :search_terms
+  = submit_tag "Search TMDb"

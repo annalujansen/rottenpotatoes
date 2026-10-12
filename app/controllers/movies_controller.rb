@@ -14,7 +14,7 @@ class MoviesController < ApplicationController
 
   # GET /movies/new
   def new
-    @movie = Movie.new
+    @movie = Movie.new(release_date: Date.today)
   end
 
   # GET /movies/1/edit
@@ -27,7 +27,7 @@ class MoviesController < ApplicationController
 
     respond_to do |format|
       if @movie.save
-        format.html { redirect_to @movie, notice: "Movie was successfully created." }
+        format.html { redirect_to movies_path, notice: "#{@movie.title} was successfully created." }
         format.json { render :show, status: :created, location: @movie }
       else
         format.html { render :new, status: :unprocessable_content }
@@ -57,6 +57,13 @@ class MoviesController < ApplicationController
       format.html { redirect_to movies_path, notice: "Movie was successfully destroyed.", status: :see_other }
       format.json { head :no_content }
     end
+  end
+
+  # POST /search_tmdb
+  # Sad path only: nenhuma busca real é feita no TMDb ainda.
+  def search_tmdb
+    flash[:warning] = "'#{params[:search_terms]}' was not found in TMDb."
+    redirect_to movies_path
   end
 
   private
