@@ -4,8 +4,17 @@ class MoviesController < ApplicationController
   # GET /movies or /movies.json
   def index
     allowed_sorts = %w[title release_date]
-    @sort = params[:sort] if allowed_sorts.include?(params[:sort])
-    @movies = @sort ? Movie.order(@sort) : Movie.all
+    @all_ratings = Movie::RATINGS
+    @sort = params[:sort] || session[:sort]
+    @sort = nil unless allowed_sorts.include?(@sort)
+    @ratings_to_show = ratings_to_show
+
+    # Lembra a ordenação e o filtro escolhidos entre requisições.
+    session[:sort] = @sort
+    session[:ratings] = @ratings_to_show
+
+    @movies = Movie.where(rating: @ratings_to_show)
+    @movies = @movies.order(@sort) if @sort
   end
 
   # GET /movies/1 or /movies/1.json
@@ -67,6 +76,17 @@ class MoviesController < ApplicationController
   end
 
   private
+    # Classificações marcadas no formulário; sem formulário, usa a sessão (ou todas).
+    def ratings_to_show
+      if params[:ratings]
+        params[:ratings].keys & Movie::RATINGS
+      elsif params[:commit] == "Refresh"
+        []
+      else
+        session[:ratings] || Movie::RATINGS
+      end
+    end
+
     # Use callbacks to share common setup or constraints between actions.
     def set_movie
       @movie = Movie.find(params.expect(:id))

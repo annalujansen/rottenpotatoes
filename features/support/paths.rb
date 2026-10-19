@@ -3,6 +3,7 @@
 module NavigationHelpers
   def path_to(page_name)
     case page_name
+    when /^the home\s?page$/ then root_path
     when /^the RottenPotatoes home page$/ then movies_path
     when /^the Create New Movie page$/ then new_movie_path
     else
